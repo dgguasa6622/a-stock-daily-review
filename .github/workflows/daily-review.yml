@@ -53,15 +53,17 @@ jobs:
         run: |
           git config user.name "A-Stock Review Bot"
           git config user.email "bot@a-stock-review.local"
-          git add output/
+          git add docs/
           git diff --staged --quiet || git commit -m "📊 每日复盘报告 $(date +%Y-%m-%d)"
           git push
       
-      - name: 部署到 GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+      - name: 设置 GitHub Pages
+        uses: actions/configure-pages@v4
+      
+      - name: 上传 Pages 文件
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./output
-          destination_dir: ./
-          commit_message: 'Deploy: 每日复盘报告'
-          keep_files: true
+          path: ./docs
+      
+      - name: 部署到 GitHub Pages
+        uses: actions/deploy-pages@v4

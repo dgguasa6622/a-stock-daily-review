@@ -12,7 +12,7 @@ import os
 import sys
 
 # 输出目录
-OUTPUT_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "output")
+OUTPUT_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "docs")
 
 
 def get_market_index():

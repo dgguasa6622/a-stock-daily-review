@@ -1,6 +1,6 @@
 __pycache__/
 *.pyc
 .env
-output/*.json
-!output/index.html
-!output/report.md
+docs/*.json
+!docs/index.html
+!docs/report.md

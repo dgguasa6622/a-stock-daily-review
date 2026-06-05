@@ -11,7 +11,7 @@ from string import Template
 
 # 路径配置
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-OUTPUT_DIR = os.path.join(BASE_DIR, "output")
+OUTPUT_DIR = os.path.join(BASE_DIR, "docs")
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 
 
