@@ -138,29 +138,54 @@ def get_market_index():
 # ============================================================
 
 def get_historical_amount():
-    """成交额环比和5日均值（东方财富K线优先，失败则用N/A标记）"""
+    """成交额环比和5日均值"""
     print("📅 获取历史成交额对比...")
+    
+    # 方案1: 东方财富 push2his K线接口（和 push2 不同域名，Actions 中可能可用）
     amounts = em_index_daily("1.000001", days=6)
-    if not amounts or len(amounts) < 2:
-        print("  ⚠️ 历史成交额获取失败（东方财富K线不可用）")
+    if amounts and len(amounts) >= 2:
+        today_amt = amounts[-1]
+        prev_amt = amounts[-2]
+        prev_5 = amounts[-6:-1] if len(amounts) >= 6 else amounts[:-1]
+        avg_5d = sum(prev_5) / len(prev_5) if prev_5 else today_amt
+        prev_change = ((today_amt - prev_amt) / prev_amt * 100) if prev_amt > 0 else 0
+        vs_5d = ((today_amt - avg_5d) / avg_5d * 100) if avg_5d > 0 else 0
+        print(f"  ✅ 环比: {prev_change:+.2f}%, 5日均: {avg_5d:.1f}亿")
         return {
-            "前一交易日成交额(亿)": "N/A", "环比变化(%)": "N/A",
-            "5日均成交额(亿)": "N/A", "与5日均值比(%)": "N/A"
+            "前一交易日成交额(亿)": round(prev_amt, 2),
+            "环比变化(%)": round(prev_change, 2),
+            "5日均成交额(亿)": round(avg_5d, 2),
+            "与5日均值比(%)": round(vs_5d, 2)
         }
-
-    today_amt = amounts[-1]
-    prev_amt = amounts[-2] if len(amounts) >= 2 else today_amt
-    prev_5 = amounts[-6:-1] if len(amounts) >= 6 else amounts[:-1]
-    avg_5d = sum(prev_5) / len(prev_5) if prev_5 else today_amt
-
-    prev_change = ((today_amt - prev_amt) / prev_amt * 100) if prev_amt > 0 else 0
-    vs_5d = ((today_amt - avg_5d) / avg_5d * 100) if avg_5d > 0 else 0
-
+    
+    # 方案2: akshare 东方财富日K（备用）
+    try:
+        import akshare as ak
+        df = ak.stock_zh_index_daily_em(symbol="sh000001")
+        if df is not None and not df.empty and "amount" in df.columns:
+            df = df.tail(6)
+            amounts = (df["amount"] / 1e8).tolist()
+            if len(amounts) >= 2:
+                today_amt = amounts[-1]
+                prev_amt = amounts[-2]
+                prev_5 = amounts[-6:-1] if len(amounts) >= 6 else amounts[:-1]
+                avg_5d = sum(prev_5) / len(prev_5) if prev_5 else today_amt
+                prev_change = ((today_amt - prev_amt) / prev_amt * 100) if prev_amt > 0 else 0
+                vs_5d = ((today_amt - avg_5d) / avg_5d * 100) if avg_5d > 0 else 0
+                print(f"  ✅ 环比: {prev_change:+.2f}%, 5日均: {avg_5d:.1f}亿")
+                return {
+                    "前一交易日成交额(亿)": round(prev_amt, 2),
+                    "环比变化(%)": round(prev_change, 2),
+                    "5日均成交额(亿)": round(avg_5d, 2),
+                    "与5日均值比(%)": round(vs_5d, 2)
+                }
+    except Exception as e:
+        pass
+    
+    print("  ⚠️ 历史成交额获取失败")
     return {
-        "前一交易日成交额(亿)": round(prev_amt, 2),
-        "环比变化(%)": round(prev_change, 2),
-        "5日均成交额(亿)": round(avg_5d, 2),
-        "与5日均值比(%)": round(vs_5d, 2)
+        "前一交易日成交额(亿)": "N/A", "环比变化(%)": "N/A",
+        "5日均成交额(亿)": "N/A", "与5日均值比(%)": "N/A"
     }
 
 
