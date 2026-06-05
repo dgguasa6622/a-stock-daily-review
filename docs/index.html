@@ -13,147 +13,72 @@
             color: #e0e0e0;
             padding: 20px;
         }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
+        .container { max-width: 1200px; margin: 0 auto; }
         .header {
-            text-align: center;
-            padding: 40px 20px;
+            text-align: center; padding: 40px 20px;
             background: linear-gradient(135deg, #e94560, #0f3460);
-            border-radius: 16px;
-            margin-bottom: 24px;
+            border-radius: 16px; margin-bottom: 24px;
         }
-        .header h1 {
-            font-size: 2.2em;
-            color: #fff;
-            margin-bottom: 8px;
-        }
-        .header .date {
-            font-size: 1.1em;
-            color: rgba(255,255,255,0.8);
-        }
+        .header h1 { font-size: 2.2em; color: #fff; margin-bottom: 8px; }
+        .header .date { font-size: 1.1em; color: rgba(255,255,255,0.8); }
         .header .sentiment {
-            display: inline-block;
-            margin-top: 12px;
-            padding: 8px 24px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 20px;
-            font-size: 1.3em;
-            color: #fff;
+            display: inline-block; margin-top: 12px; padding: 8px 24px;
+            background: rgba(255,255,255,0.15); border-radius: 20px;
+            font-size: 1.3em; color: #fff;
         }
         .card {
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 20px;
+            background: rgba(255,255,255,0.05); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+            padding: 24px; margin-bottom: 20px;
         }
         .card h2 {
-            font-size: 1.3em;
-            color: #e94560;
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid rgba(233,69,96,0.3);
+            font-size: 1.3em; color: #e94560; margin-bottom: 16px;
+            padding-bottom: 8px; border-bottom: 2px solid rgba(233,69,96,0.3);
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.95em;
+        .card h3 {
+            font-size: 1.05em; color: #ff9a76; margin: 16px 0 10px;
         }
-        th {
-            background: rgba(233,69,96,0.2);
-            padding: 10px 12px;
-            text-align: left;
-            font-weight: 600;
-            color: #e94560;
-        }
-        td {
-            padding: 10px 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-        }
-        tr:hover {
-            background: rgba(255,255,255,0.04);
-        }
+        table { width: 100%; border-collapse: collapse; font-size: 0.92em; }
+        th { background: rgba(233,69,96,0.2); padding: 10px 8px; text-align: left; font-weight: 600; color: #e94560; white-space: nowrap; }
+        td { padding: 9px 8px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        tr:hover { background: rgba(255,255,255,0.04); }
         .number { text-align: right; font-variant-numeric: tabular-nums; }
+        .center { text-align: center; }
         .up { color: #ff4d4d; font-weight: 600; }
         .down { color: #4dff4d; font-weight: 600; }
         .flat { color: #888; }
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        @media (max-width: 768px) {
-            .grid-2 { grid-template-columns: 1fr; }
-        }
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-        .stat-item {
-            text-align: center;
-            padding: 16px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-            min-width: 120px;
-        }
-        .stat-value {
-            font-size: 1.8em;
-            font-weight: 700;
-        }
-        .stat-label {
-            font-size: 0.85em;
-            color: #888;
-            margin-top: 4px;
-        }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+        .stats { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 16px; }
+        .stat-item { text-align: center; padding: 14px 12px; background: rgba(255,255,255,0.05); border-radius: 8px; min-width: 110px; }
+        .stat-value { font-size: 1.6em; font-weight: 700; }
+        .stat-label { font-size: 0.8em; color: #888; margin-top: 4px; }
+        .stat-sub { font-size: 0.75em; color: #aaa; margin-top: 2px; }
         .tag {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 14px;
-            margin: 4px;
-            font-size: 0.9em;
+            display: inline-block; padding: 3px 10px; border-radius: 12px;
+            margin: 2px; font-size: 0.82em;
         }
         .tag.up { background: rgba(255,77,77,0.2); }
         .tag.down { background: rgba(77,255,77,0.2); }
-        .bar-row {
-            display: flex;
-            align-items: center;
-            margin: 6px 0;
-            gap: 12px;
+        .bar-row { display: flex; align-items: center; margin: 6px 0; gap: 12px; }
+        .bar-label { width: 100px; font-size: 0.85em; color: #aaa; text-align: right; }
+        .bar-bg { flex: 1; height: 18px; background: rgba(255,255,255,0.08); border-radius: 9px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 9px; transition: width 0.5s ease; }
+        .bar-count { width: 120px; font-size: 0.85em; color: #ccc; }
+        .sub-row { font-size: 0.82em; color: #aaa; padding: 3px 8px 3px 24px; display: flex; gap: 12px; flex-wrap: wrap; }
+        .reason-tag {
+            display: inline-block; padding: 2px 8px; border-radius: 10px;
+            font-size: 0.78em; margin: 1px 3px;
+            background: rgba(255,255,255,0.08); color: #ccc;
         }
-        .bar-label {
-            width: 100px;
-            font-size: 0.85em;
-            color: #aaa;
-            text-align: right;
-        }
-        .bar-bg {
-            flex: 1;
-            height: 18px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 9px;
-            overflow: hidden;
-        }
-        .bar-fill {
-            height: 100%;
-            border-radius: 9px;
-            transition: width 0.5s ease;
-        }
-        .bar-count {
-            width: 120px;
-            font-size: 0.85em;
-            color: #ccc;
-        }
-        .footer {
-            text-align: center;
-            padding: 24px;
-            color: #666;
-            font-size: 0.85em;
-        }
+        .reason-tag.leader { background: rgba(233,69,96,0.25); color: #ff9a76; }
+        .reason-tag.early { background: rgba(255,153,0,0.2); color: #ffb84d; }
+        .footer { text-align: center; padding: 24px; color: #666; font-size: 0.85em; }
+        .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 768px) { .summary-grid { grid-template-columns: 1fr; } }
+        .small-table { font-size: 0.85em; }
+        .small-table td, .small-table th { padding: 6px 8px; }
+        .highlight { color: #ff9a76; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -161,42 +86,46 @@
         <!-- 头部 -->
         <div class="header">
             <h1>📊 A股每日复盘报告</h1>
-            <div class="date">2026-06-05 | 2026-06-05 08:30:50</div>
-            <div class="sentiment">市场情绪: 数据缺失</div>
+            <div class="date">2026-06-05 | 2026-06-05 16:56:22</div>
+            <div class="sentiment">市场情绪: 😐 中性</div>
         </div>
 
-        <!-- 核心统计 -->
+        <!-- 核心概览（含成交额对比） -->
         <div class="card">
             <h2>📈 核心概览</h2>
             <div class="stats">
                 <div class="stat-item">
-                    <div class="stat-value up">0</div>
+                    <div class="stat-value up">2850</div>
                     <div class="stat-label">上涨家数</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-value down">0</div>
+                    <div class="stat-value down">1980</div>
                     <div class="stat-label">下跌家数</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-value">0</div>
+                    <div class="stat-value">9560.5</div>
                     <div class="stat-label">总成交额(亿)</div>
+                    
+                <div class="stat-sub"><span class="up">环比 +7.2%</span></div>
+                <div class="stat-sub">5日均 8765.4亿</div>
+                <div class="stat-sub"><span class="up">vs5日 +9.1%</span></div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-value up">73</div>
+                    <div class="stat-value up">48</div>
                     <div class="stat-label">涨停家数</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-value down">11</div>
+                    <div class="stat-value down">12</div>
                     <div class="stat-label">跌停家数</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-value">N/A</div>
+                    <div class="stat-value">35.6</div>
                     <div class="stat-label">北向资金(亿)</div>
                 </div>
             </div>
         </div>
 
-        <!-- 大盘指数 -->
+        <!-- 大盘指数（8个） -->
         <div class="card">
             <h2>📊 大盘指数</h2>
             <table>
@@ -209,124 +138,667 @@
                         <th class="number">成交额</th>
                     </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody>
+        <tr>
+            <td>上证指数</td>
+            <td class="number">3350.25</td>
+            <td class="number up">▲ +0.82%</td>
+            <td class="number">27.3</td>
+            <td class="number">4521.33亿</td>
+        </tr>
+        <tr>
+            <td>深证成指</td>
+            <td class="number">10820.50</td>
+            <td class="number up">▲ +1.15%</td>
+            <td class="number">123.1</td>
+            <td class="number">6234.56亿</td>
+        </tr>
+        <tr>
+            <td>创业板指</td>
+            <td class="number">2150.80</td>
+            <td class="number down">▼ -0.35%</td>
+            <td class="number">-7.6</td>
+            <td class="number">1890.2亿</td>
+        </tr>
+        <tr>
+            <td>科创50</td>
+            <td class="number">880.15</td>
+            <td class="number up">▲ +1.52%</td>
+            <td class="number">13.2</td>
+            <td class="number">756.8亿</td>
+        </tr>
+        <tr>
+            <td>沪深300</td>
+            <td class="number">3980.60</td>
+            <td class="number up">▲ +0.45%</td>
+            <td class="number">17.8</td>
+            <td class="number">2560.4亿</td>
+        </tr>
+        <tr>
+            <td>中证500</td>
+            <td class="number">6120.35</td>
+            <td class="number up">▲ +0.92%</td>
+            <td class="number">55.8</td>
+            <td class="number">1890.2亿</td>
+        </tr>
+        <tr>
+            <td>中证1000</td>
+            <td class="number">6880.50</td>
+            <td class="number up">▲ +1.25%</td>
+            <td class="number">85.1</td>
+            <td class="number">2340.6亿</td>
+        </tr>
+        <tr>
+            <td>中证2000</td>
+            <td class="number">2450.80</td>
+            <td class="number up">▲ +1.68%</td>
+            <td class="number">40.5</td>
+            <td class="number">1120.3亿</td>
+        </tr></tbody>
             </table>
         </div>
 
-        <!-- 行业板块 + 概念板块 -->
-        <div class="grid-2">
-            <div class="card">
-                <h2>🏭 行业板块 TOP10</h2>
-                <table>
-                    <thead><tr><th>板块</th><th class="number">涨跌幅</th><th>领涨股</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-            <div class="card">
-                <h2>📉 行业板块 跌幅榜</h2>
-                <table>
-                    <thead><tr><th>板块</th><th class="number">涨跌幅</th><th>领跌股</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
+        <!-- 行业板块 TOP10（含领涨股TOP3） -->
+        <div class="card">
+            <h2>🏭 行业板块 TOP10</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>排名</th>
+                        <th>板块</th>
+                        <th class="number">涨跌幅</th>
+                        <th class="number">成交额</th>
+                        <th>领涨股 TOP3</th>
+                    </tr>
+                </thead>
+                <tbody>
+        <tr>
+            <td class="center">1</td>
+            <td>半导体</td>
+            <td class="number up">▲ +3.52%</td>
+            <td class="number">452.3</td>
+            <td style="font-size:0.85em;"><span class="up">1.中芯国际(+8.50%)</span> | <span class="up">2.北方华创(+6.20%)</span> | <span class="up">3.韦尔股份(+5.10%)</span></td>
+        </tr>
+        <tr>
+            <td class="center">2</td>
+            <td>计算机应用</td>
+            <td class="number up">▲ +2.85%</td>
+            <td class="number">385.6</td>
+            <td style="font-size:0.85em;"><span class="up">1.科大讯飞(+7.30%)</span> | <span class="up">2.金山办公(+5.60%)</span> | <span class="up">3.用友网络(+4.80%)</span></td>
+        </tr>
+        <tr>
+            <td class="center">3</td>
+            <td>通信设备</td>
+            <td class="number up">▲ +2.30%</td>
+            <td class="number">320.1</td>
+            <td style="font-size:0.85em;"><span class="up">1.中兴通讯(+6.10%)</span> | <span class="up">2.烽火通信(+4.50%)</span> | <span class="up">3.光迅科技(+4.20%)</span></td>
+        </tr>
+        <tr>
+            <td class="center">4</td>
+            <td>电子制造</td>
+            <td class="number up">▲ +1.95%</td>
+            <td class="number">280.4</td>
+            <td style="font-size:0.85em;"><span class="up">1.立讯精密(+5.80%)</span> | <span class="up">2.歌尔股份(+4.20%)</span> | <span class="up">3.蓝思科技(+3.90%)</span></td>
+        </tr>
+        <tr>
+            <td class="center">5</td>
+            <td>国防军工</td>
+            <td class="number up">▲ +1.78%</td>
+            <td class="number">256.8</td>
+            <td style="font-size:0.85em;"><span class="up">1.中国卫星(+6.50%)</span> | <span class="up">2.中航沈飞(+5.10%)</span> | <span class="up">3.航天彩虹(+4.60%)</span></td>
+        </tr>
+        <tr>
+            <td class="center">6</td>
+            <td>电力设备</td>
+            <td class="number up">▲ +1.55%</td>
+            <td class="number">420.5</td>
+            <td style="font-size:0.85em;"><span class="up">1.宁德时代(+5.20%)</span> | <span class="up">2.阳光电源(+4.80%)</span> | <span class="up">3.亿纬锂能(+4.10%)</span></td>
+        </tr>
+        <tr>
+            <td class="center">7</td>
+            <td>汽车整车</td>
+            <td class="number up">▲ +1.42%</td>
+            <td class="number">310.2</td>
+            <td style="font-size:0.85em;"><span class="up">1.比亚迪(+6.30%)</span> | <span class="up">2.长城汽车(+4.50%)</span> | <span class="up">3.长安汽车(+3.80%)</span></td>
+        </tr>
+        <tr>
+            <td class="center">8</td>
+            <td>专用设备</td>
+            <td class="number up">▲ +1.28%</td>
+            <td class="number">180.3</td>
+            <td style="font-size:0.85em;"><span class="up">1.先导智能(+5.60%)</span> | <span class="up">2.晶盛机电(+4.20%)</span> | <span class="up">3.捷佳伟创(+3.90%)</span></td>
+        </tr>
+        <tr>
+            <td class="center">9</td>
+            <td>光学光电子</td>
+            <td class="number up">▲ +1.10%</td>
+            <td class="number">156.7</td>
+            <td style="font-size:0.85em;"><span class="up">1.京东方A(+4.50%)</span> | <span class="up">2.TCL科技(+3.80%)</span> | <span class="up">3.三安光电(+3.20%)</span></td>
+        </tr>
+        <tr>
+            <td class="center">10</td>
+            <td>化学制药</td>
+            <td class="number up">▲ +0.95%</td>
+            <td class="number">145.2</td>
+            <td style="font-size:0.85em;"><span class="up">1.恒瑞医药(+4.10%)</span> | <span class="up">2.药明康德(+3.50%)</span> | <span class="up">3.复星医药(+2.80%)</span></td>
+        </tr></tbody>
+            </table>
         </div>
 
-        <!-- 概念板块 -->
+        <!-- 行业板块 跌幅榜（5个） -->
         <div class="card">
-            <h2>💡 概念板块热度</h2>
-            <div style="margin-bottom:12px;"><strong>🔥 涨幅前5:</strong><br></div>
-            <div><strong>❄️ 跌幅前5:</strong><br></div>
+            <h2>📉 行业板块 跌幅榜 TOP5</h2>
+            <table>
+                <thead>
+                    <tr><th>排名</th><th>板块</th><th class="number">涨跌幅</th><th class="number">成交额</th></tr></thead>
+                <tbody>
+        <tr>
+            <td class="center">1</td>
+            <td>煤炭开采</td>
+            <td class="number down">▼ -2.10%</td>
+            <td class="number">89.5</td>
+        </tr>
+        <tr>
+            <td class="center">2</td>
+            <td>银行</td>
+            <td class="number down">▼ -1.80%</td>
+            <td class="number">156.3</td>
+        </tr>
+        <tr>
+            <td class="center">3</td>
+            <td>房地产开发</td>
+            <td class="number down">▼ -1.55%</td>
+            <td class="number">112.4</td>
+        </tr>
+        <tr>
+            <td class="center">4</td>
+            <td>钢铁</td>
+            <td class="number down">▼ -1.30%</td>
+            <td class="number">78.2</td>
+        </tr>
+        <tr>
+            <td class="center">5</td>
+            <td>建筑材料</td>
+            <td class="number down">▼ -1.15%</td>
+            <td class="number">65.8</td>
+        </tr></tbody>
+            </table>
+        </div>
+
+        <!-- 概念板块（表格形式，含涨停统计） -->
+        <div class="card">
+            <h2>💡 概念板块 TOP10（含涨停统计）</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>概念名称</th>
+                        <th class="number">涨跌幅</th>
+                        <th class="number">涨停个数</th>
+                        <th class="number">涨超5%个数</th>
+                    </tr>
+                </thead>
+                <tbody>
+        <tr>
+            <td>光刻机</td>
+            <td class="number up">▲ +4.20%</td>
+            <td class="number up">3</td>
+            <td class="number">8</td>
+        </tr>
+        <tr>
+            <td>Chiplet</td>
+            <td class="number up">▲ +3.85%</td>
+            <td class="number up">2</td>
+            <td class="number">7</td>
+        </tr>
+        <tr>
+            <td>存储芯片</td>
+            <td class="number up">▲ +3.30%</td>
+            <td class="number up">2</td>
+            <td class="number">6</td>
+        </tr>
+        <tr>
+            <td>6G概念</td>
+            <td class="number up">▲ +2.90%</td>
+            <td class="number up">1</td>
+            <td class="number">5</td>
+        </tr>
+        <tr>
+            <td>先进封装</td>
+            <td class="number up">▲ +2.55%</td>
+            <td class="number up">2</td>
+            <td class="number">6</td>
+        </tr>
+        <tr>
+            <td>AI手机</td>
+            <td class="number up">▲ +2.40%</td>
+            <td class="number up">1</td>
+            <td class="number">4</td>
+        </tr>
+        <tr>
+            <td>机器人</td>
+            <td class="number up">▲ +2.20%</td>
+            <td class="number up">2</td>
+            <td class="number">5</td>
+        </tr>
+        <tr>
+            <td>低空经济</td>
+            <td class="number up">▲ +2.10%</td>
+            <td class="number up">1</td>
+            <td class="number">4</td>
+        </tr>
+        <tr>
+            <td>量子科技</td>
+            <td class="number up">▲ +1.95%</td>
+            <td class="number up">1</td>
+            <td class="number">3</td>
+        </tr>
+        <tr>
+            <td>数据要素</td>
+            <td class="number up">▲ +1.80%</td>
+            <td class="number up">0</td>
+            <td class="number">3</td>
+        </tr></tbody>
+            </table>
+            <div style="margin-top:12px;"><strong>📉 跌幅前5:</strong><br><span class="tag down">❄️ 社区团购 -1.80%</span><span class="tag down">❄️ 预制菜 -1.55%</span><span class="tag down">❄️ 猪肉 -1.30%</span><span class="tag down">❄️ 土地流转 -1.10%</span><span class="tag down">❄️ 物业管理 -0.95%</span></div>
         </div>
 
         <!-- 市场宽度 -->
         <div class="card">
             <h2>📊 市场宽度分布</h2>
             
+        <div class="bar-row">
+            <span class="bar-label">涨停(≥9%)</span>
+            <div class="bar-bg"><div class="bar-fill" style="width:0.9937888198757764%;background:#ff0000"></div></div>
+            <span class="bar-count">48家 (1.0%)</span>
+        </div>
+        <div class="bar-row">
+            <span class="bar-label">大涨(5%-9%)</span>
+            <div class="bar-bg"><div class="bar-fill" style="width:3.229813664596273%;background:#ff6600"></div></div>
+            <span class="bar-count">156家 (3.2%)</span>
+        </div>
+        <div class="bar-row">
+            <span class="bar-label">中涨(3%-5%)</span>
+            <div class="bar-bg"><div class="bar-fill" style="width:8.695652173913043%;background:#ff9900"></div></div>
+            <span class="bar-count">420家 (8.7%)</span>
+        </div>
+        <div class="bar-row">
+            <span class="bar-label">小涨(0-3%)</span>
+            <div class="bar-bg"><div class="bar-fill" style="width:46.08695652173913%;background:#ffcccc"></div></div>
+            <span class="bar-count">2226家 (46.1%)</span>
+        </div>
+        <div class="bar-row">
+            <span class="bar-label">小跌(0-3%)</span>
+            <div class="bar-bg"><div class="bar-fill" style="width:31.469979296066253%;background:#ccffcc"></div></div>
+            <span class="bar-count">1520家 (31.5%)</span>
+        </div>
+        <div class="bar-row">
+            <span class="bar-label">中跌(3%-5%)</span>
+            <div class="bar-bg"><div class="bar-fill" style="width:6.418219461697723%;background:#99cc00"></div></div>
+            <span class="bar-count">310家 (6.4%)</span>
+        </div>
+        <div class="bar-row">
+            <span class="bar-label">大跌(5%-9%)</span>
+            <div class="bar-bg"><div class="bar-fill" style="width:2.857142857142857%;background:#66aa00"></div></div>
+            <span class="bar-count">138家 (2.9%)</span>
+        </div>
+        <div class="bar-row">
+            <span class="bar-label">跌停(≤-9%)</span>
+            <div class="bar-bg"><div class="bar-fill" style="width:0.2484472049689441%;background:#009900"></div></div>
+            <span class="bar-count">12家 (0.2%)</span>
+        </div>
         </div>
 
-        <!-- 涨停明细 + 热门个股 -->
-        <div class="grid-2">
-            <div class="card">
-                <h2>🚀 涨停板明细</h2>
-                <table>
-                    <thead><tr><th>代码</th><th>名称</th><th>连板</th><th>封单</th></tr></thead>
-                    <tbody>
+        <!-- 涨停板全量 + 归因汇总 -->
+        <div class="card">
+            <h2>🚀 涨停板全量分析（48只）</h2>
+            
+    <div class="summary-grid" style="margin-bottom:16px;">
+        <div>
+            <strong style="color:#ff9a76;">连板分布</strong>
+            <table class="small-table" style="margin-top:6px;">
+                <tr><td>首板</td><td class="number">32</td></tr>
+                <tr><td>2连板</td><td class="number">8</td></tr>
+                <tr><td>3-4连板</td><td class="number">5</td></tr>
+                <tr><td>5连板及以上</td><td class="number up">3</td></tr>
+            </table>
+        </div>
+        <div>
+            <strong style="color:#ff9a76;">封板时间分布</strong>
+            <table class="small-table" style="margin-top:6px;">
+                <tr><td>早盘秒板</td><td class="number up">12</td></tr>
+                <tr><td>早盘封板</td><td class="number">18</td></tr>
+                <tr><td>其他</td><td class="number">18</td></tr>
+            </table>
+        </div>
+    </div>
+            <h3>涨停个股明细</h3>
+            <table class="small-table">
+                <thead>
+                    <tr>
+                        <th>代码</th>
+                        <th>名称</th>
+                        <th class="number">涨幅</th>
+                        <th class="center">连板</th>
+                        <th>封板时间</th>
+                        <th>涨停原因</th>
+                        <th class="number">封单</th>
+                    </tr>
+                </thead>
+                <tbody>
         <tr>
-            <td>002354</td>
-            <td>天娱数科</td>
-            <td>1</td>
-            <td></td>
+            <td>688981</td>
+            <td>中芯国际</td>
+            <td class="number up">+20.00%</td>
+            <td class="center">1</td>
+            <td>09:35</td>
+            <td><span class="reason-tag ">早盘封板 + 首板涨停</span></td>
+            <td class="number">5.2亿</td>
         </tr>
         <tr>
-            <td>603888</td>
-            <td>新华网</td>
-            <td>1</td>
-            <td></td>
+            <td>002230</td>
+            <td>科大讯飞</td>
+            <td class="number up">+10.01%</td>
+            <td class="center">2</td>
+            <td>09:42</td>
+            <td><span class="reason-tag ">2连板 + 早盘封板</span></td>
+            <td class="number">3.8亿</td>
         </tr>
         <tr>
-            <td>603500</td>
-            <td>祥和实业</td>
-            <td>2</td>
-            <td></td>
+            <td>002371</td>
+            <td>北方华创</td>
+            <td class="number up">+10.00%</td>
+            <td class="center">1</td>
+            <td>10:15</td>
+            <td><span class="reason-tag ">早盘封板 + 首板涨停</span></td>
+            <td class="number">4.1亿</td>
         </tr>
         <tr>
-            <td>603859</td>
-            <td>能科科技</td>
-            <td>1</td>
-            <td></td>
+            <td>300750</td>
+            <td>宁德时代</td>
+            <td class="number up">+10.00%</td>
+            <td class="center">1</td>
+            <td>09:50</td>
+            <td><span class="reason-tag ">巨量封板(85亿) + 早盘封板</span></td>
+            <td class="number">8.5亿</td>
         </tr>
         <tr>
-            <td>002421</td>
-            <td>达实智能</td>
-            <td>1</td>
-            <td></td>
+            <td>600519</td>
+            <td>贵州茅台</td>
+            <td class="number up">+10.00%</td>
+            <td class="center">1</td>
+            <td>13:05</td>
+            <td><span class="reason-tag ">巨量封板(65亿) + 首板涨停</span></td>
+            <td class="number">12.3亿</td>
         </tr>
         <tr>
-            <td>002471</td>
-            <td>中超控股</td>
-            <td>1</td>
-            <td></td>
+            <td>000858</td>
+            <td>五粮液</td>
+            <td class="number up">+10.00%</td>
+            <td class="center">3</td>
+            <td>09:38</td>
+            <td><span class="reason-tag ">3连板 + 早盘封板</span></td>
+            <td class="number">6.8亿</td>
         </tr>
         <tr>
-            <td>300052</td>
-            <td>中青宝</td>
-            <td>1</td>
-            <td></td>
+            <td>600118</td>
+            <td>中国卫星</td>
+            <td class="number up">+10.02%</td>
+            <td class="center">5</td>
+            <td>09:31</td>
+            <td><span class="reason-tag leader">5连板龙头 + 早盘秒板</span></td>
+            <td class="number">2.1亿</td>
         </tr>
         <tr>
-            <td>000520</td>
-            <td>凤凰航运</td>
-            <td>2</td>
-            <td></td>
+            <td>002594</td>
+            <td>比亚迪</td>
+            <td class="number up">+10.00%</td>
+            <td class="center">1</td>
+            <td>10:30</td>
+            <td><span class="reason-tag ">巨量封板(59亿) + 首板涨停</span></td>
+            <td class="number">7.2亿</td>
         </tr>
         <tr>
-            <td>002251</td>
-            <td>步步高</td>
-            <td>1</td>
-            <td></td>
+            <td>000063</td>
+            <td>中兴通讯</td>
+            <td class="number up">+10.01%</td>
+            <td class="center">2</td>
+            <td>09:45</td>
+            <td><span class="reason-tag ">2连板 + 早盘封板</span></td>
+            <td class="number">4.5亿</td>
         </tr>
         <tr>
-            <td>002903</td>
-            <td>宇环数控</td>
-            <td>1</td>
-            <td></td>
+            <td>600760</td>
+            <td>中航沈飞</td>
+            <td class="number up">+10.00%</td>
+            <td class="center">1</td>
+            <td>14:20</td>
+            <td><span class="reason-tag ">首板涨停</span></td>
+            <td class="number">3.2亿</td>
+        </tr>
+        <tr>
+            <td>002475</td>
+            <td>立讯精密</td>
+            <td class="number up">+10.00%</td>
+            <td class="center">1</td>
+            <td>09:55</td>
+            <td><span class="reason-tag ">早盘封板 + 首板涨停</span></td>
+            <td class="number">5.8亿</td>
+        </tr>
+        <tr>
+            <td>688111</td>
+            <td>金山办公</td>
+            <td class="number up">+20.00%</td>
+            <td class="center">1</td>
+            <td>10:05</td>
+            <td><span class="reason-tag ">首板涨停</span></td>
+            <td class="number">2.5亿</td>
         </tr></tbody>
-                </table>
-                
-            </div>
-            <div class="card">
-                <h2>🔥 成交额 TOP10</h2>
-                <table>
-                    <thead><tr><th>代码</th><th>名称</th><th class="number">价格</th><th class="number">涨跌幅</th><th class="number">成交额</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
+            </table>
+        </div>
+
+        <!-- 成交额 TOP20 + 占比 -->
+        <div class="card">
+            <h2>🔥 成交额 TOP20 <span style="font-size:0.7em;color:#888;">（占全市场 9.33%）</span></h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>排名</th>
+                        <th>代码</th>
+                        <th>名称</th>
+                        <th class="number">价格</th>
+                        <th class="number">涨跌幅</th>
+                        <th class="number">成交额</th>
+                        <th class="number">换手率</th>
+                    </tr>
+                </thead>
+                <tbody>
+        <tr>
+            <td class="center">1</td>
+            <td>000858</td>
+            <td>五粮液</td>
+            <td class="number">168.50</td>
+            <td class="number up">▲ +2.35%</td>
+            <td class="number">85.6亿</td>
+            <td class="number">2.1</td>
+        </tr>
+        <tr>
+            <td class="center">2</td>
+            <td>300750</td>
+            <td>宁德时代</td>
+            <td class="number">210.30</td>
+            <td class="number up">▲ +1.80%</td>
+            <td class="number">72.3亿</td>
+            <td class="number">1.55</td>
+        </tr>
+        <tr>
+            <td class="center">3</td>
+            <td>600519</td>
+            <td>贵州茅台</td>
+            <td class="number">1750.00</td>
+            <td class="number down">▼ -0.52%</td>
+            <td class="number">65.2亿</td>
+            <td class="number">0.35</td>
+        </tr>
+        <tr>
+            <td class="center">4</td>
+            <td>002594</td>
+            <td>比亚迪</td>
+            <td class="number">285.60</td>
+            <td class="number up">▲ +3.10%</td>
+            <td class="number">58.9亿</td>
+            <td class="number">2.8</td>
+        </tr>
+        <tr>
+            <td class="center">5</td>
+            <td>688981</td>
+            <td>中芯国际</td>
+            <td class="number">95.80</td>
+            <td class="number up">▲ +5.20%</td>
+            <td class="number">52.3亿</td>
+            <td class="number">4.5</td>
+        </tr>
+        <tr>
+            <td class="center">6</td>
+            <td>000063</td>
+            <td>中兴通讯</td>
+            <td class="number">38.50</td>
+            <td class="number up">▲ +6.10%</td>
+            <td class="number">48.6亿</td>
+            <td class="number">5.2</td>
+        </tr>
+        <tr>
+            <td class="center">7</td>
+            <td>002230</td>
+            <td>科大讯飞</td>
+            <td class="number">68.20</td>
+            <td class="number up">▲ +7.30%</td>
+            <td class="number">45.8亿</td>
+            <td class="number">6.1</td>
+        </tr>
+        <tr>
+            <td class="center">8</td>
+            <td>002371</td>
+            <td>北方华创</td>
+            <td class="number">380.50</td>
+            <td class="number up">▲ +8.50%</td>
+            <td class="number">42.1亿</td>
+            <td class="number">3.8</td>
+        </tr>
+        <tr>
+            <td class="center">9</td>
+            <td>002475</td>
+            <td>立讯精密</td>
+            <td class="number">42.80</td>
+            <td class="number up">▲ +5.80%</td>
+            <td class="number">39.5亿</td>
+            <td class="number">4.2</td>
+        </tr>
+        <tr>
+            <td class="center">10</td>
+            <td>300274</td>
+            <td>阳光电源</td>
+            <td class="number">128.60</td>
+            <td class="number up">▲ +4.80%</td>
+            <td class="number">36.2亿</td>
+            <td class="number">3.5</td>
+        </tr>
+        <tr>
+            <td class="center">11</td>
+            <td>600118</td>
+            <td>中国卫星</td>
+            <td class="number">45.30</td>
+            <td class="number up">▲ +10.02%</td>
+            <td class="number">33.8亿</td>
+            <td class="number">8.5</td>
+        </tr>
+        <tr>
+            <td class="center">12</td>
+            <td>000725</td>
+            <td>京东方A</td>
+            <td class="number">4.85</td>
+            <td class="number up">▲ +4.50%</td>
+            <td class="number">31.5亿</td>
+            <td class="number">2.8</td>
+        </tr>
+        <tr>
+            <td class="center">13</td>
+            <td>688111</td>
+            <td>金山办公</td>
+            <td class="number">420.00</td>
+            <td class="number up">▲ +15.80%</td>
+            <td class="number">29.4亿</td>
+            <td class="number">5.6</td>
+        </tr>
+        <tr>
+            <td class="center">14</td>
+            <td>600760</td>
+            <td>中航沈飞</td>
+            <td class="number">68.50</td>
+            <td class="number up">▲ +5.10%</td>
+            <td class="number">28.1亿</td>
+            <td class="number">3.2</td>
+        </tr>
+        <tr>
+            <td class="center">15</td>
+            <td>002241</td>
+            <td>歌尔股份</td>
+            <td class="number">28.60</td>
+            <td class="number up">▲ +4.20%</td>
+            <td class="number">26.8亿</td>
+            <td class="number">4.8</td>
+        </tr>
+        <tr>
+            <td class="center">16</td>
+            <td>603501</td>
+            <td>韦尔股份</td>
+            <td class="number">155.30</td>
+            <td class="number up">▲ +5.10%</td>
+            <td class="number">25.5亿</td>
+            <td class="number">3.6</td>
+        </tr>
+        <tr>
+            <td class="center">17</td>
+            <td>000100</td>
+            <td>TCL科技</td>
+            <td class="number">5.20</td>
+            <td class="number up">▲ +3.80%</td>
+            <td class="number">24.3亿</td>
+            <td class="number">3.1</td>
+        </tr>
+        <tr>
+            <td class="center">18</td>
+            <td>300450</td>
+            <td>先导智能</td>
+            <td class="number">42.50</td>
+            <td class="number up">▲ +5.60%</td>
+            <td class="number">23.1亿</td>
+            <td class="number">4.5</td>
+        </tr>
+        <tr>
+            <td class="center">19</td>
+            <td>600276</td>
+            <td>恒瑞医药</td>
+            <td class="number">52.30</td>
+            <td class="number up">▲ +4.10%</td>
+            <td class="number">22.4亿</td>
+            <td class="number">2.3</td>
+        </tr>
+        <tr>
+            <td class="center">20</td>
+            <td>000625</td>
+            <td>长安汽车</td>
+            <td class="number">18.60</td>
+            <td class="number up">▲ +3.80%</td>
+            <td class="number">21.8亿</td>
+            <td class="number">5.1</td>
+        </tr></tbody>
+            </table>
         </div>
 
         <!-- 页脚 -->
         <div class="footer">
             <p>⚠️ 本报告由自动化程序生成，仅供参考，不构成投资建议。</p>
-            <p>Generated by A-Stock Daily Review Bot | 2026-06-05</p>
+            <p>Generated by A-Stock Daily Review Bot v2.0 | 2026-06-05</p>
         </div>
     </div>
 </body>
