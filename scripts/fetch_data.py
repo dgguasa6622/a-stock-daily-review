@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 """
-A股每日复盘 - 数据获取模块 v3.0
-使用多数据源冗余架构：东方财富 push2（主）+ 新浪财经（备）+ 降级兜底
-涨停原因使用智能归因引擎（行业/概念/连板/封板时间多维度分析）
+A股每日复盘 - 数据获取模块 v3.1
+数据源策略：
+- 主力：akshare 新浪数据源（GitHub Actions 可用，不受东方财富 IP 封禁）
+  - stock_zh_a_spot() → 全市场行情（新浪源）
+  - stock_zh_index_spot_em() → 大盘指数（东方财富，可能不可用）
+- 备用：新浪财经 hq.sinajs.cn 直连
+- 涨停板：akshare stock_zt_pool_em()（已验证在 Actions 中可用）
+- 涨停原因：智能归因引擎（行业/概念/连板/封板时间多维度）
 """
 
 import os
@@ -10,15 +15,13 @@ import sys
 import json
 import time
 from datetime import datetime, timedelta
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
-# 确保能找到同目录模块
 sys.path.insert(0, os.path.dirname(__file__))
 
 from data_sources import (
-    em_index_spot, em_all_a_stocks, em_industry_boards, em_concept_boards,
-    em_board_stocks, em_index_daily, sina_index_spot, em_limit_up_detail,
-    em_limit_up_detail_strong, analyze_limit_up_reason
+    sina_index_spot, em_index_daily, em_limit_up_detail,
+    em_limit_up_detail_strong, analyze_limit_up_reason,
+    em_industry_boards, em_concept_boards, em_board_stocks
 )
 
 OUTPUT_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "docs")
@@ -29,49 +32,105 @@ _industry_cache = None
 _concept_cache = None
 
 
-def _get_spot_cache():
+def _get_spot_sina():
+    """全市场A股行情 - 新浪数据源（Actions 可用）"""
     global _spot_cache
-    if _spot_cache is None:
-        print("📡 获取全市场A股行情...")
-        _spot_cache = em_all_a_stocks()
-        if _spot_cache is None:
-            print("  ❌ 全市场行情获取失败，后续数据将受限")
-            _spot_cache = []
+    if _spot_cache is not None:
+        return _spot_cache
+
+    print("📡 获取全市场A股行情（新浪数据源）...")
+    try:
+        import akshare as ak
+        df = ak.stock_zh_a_spot()
+        if df is not None and not df.empty:
+            records = []
+            for _, row in df.iterrows():
+                records.append({
+                    "代码": str(row.get("代码", "")),
+                    "名称": str(row.get("名称", "")),
+                    "最新价": float(row.get("最新价", 0) or 0),
+                    "涨跌额": float(row.get("涨跌额", 0) or 0),
+                    "涨跌幅": float(row.get("涨跌幅", 0) or 0),
+                    "昨收": float(row.get("昨收", 0) or 0),
+                    "成交量": float(row.get("成交量", 0) or 0),
+                    "成交额": float(row.get("成交额", 0) or 0),
+                    "换手率": float(row.get("换手率", 0) or 0),
+                    "流通市值": float(row.get("流通市值", 0) or 0),
+                })
+            _spot_cache = records
+            print(f"  ✅ 全市场行情: {len(records)} 只")
+            return records
+    except Exception as e:
+        print(f"  ⚠️ 新浪全市场行情失败: {e}")
+
+    _spot_cache = []
     return _spot_cache
 
 
-def _get_industry_cache():
+def _get_industry_from_em():
+    """行业板块 - 东方财富 push2"""
     global _industry_cache
+    if _industry_cache is not None:
+        return _industry_cache
+    _industry_cache = em_industry_boards()
     if _industry_cache is None:
-        _industry_cache = em_industry_boards()
-        if _industry_cache is None:
-            _industry_cache = []
+        _industry_cache = []
     return _industry_cache
 
 
-def _get_concept_cache():
+def _get_concept_from_em():
+    """概念板块 - 东方财富 push2"""
     global _concept_cache
+    if _concept_cache is not None:
+        return _concept_cache
+    _concept_cache = em_concept_boards()
     if _concept_cache is None:
-        _concept_cache = em_concept_boards()
-        if _concept_cache is None:
-            _concept_cache = []
+        _concept_cache = []
     return _concept_cache
 
 
 # ============================================================
-# 大盘指数（主：东方财富 push2，备：新浪财经）
+# 大盘指数
 # ============================================================
 
 def get_market_index():
-    """获取8个大盘指数行情"""
+    """获取8个大盘指数（东方财富优先，新浪备用）"""
     print("📊 获取大盘指数...")
-    result = em_index_spot()
-    if not result or len(result) < 4:
-        print("  ⚠️ 东方财富接口异常，切换新浪财经...")
-        result = sina_index_spot()
+
+    # 先试东方财富
+    try:
+        import akshare as ak
+        df = ak.stock_zh_index_spot_em()
+        if df is not None and not df.empty:
+            targets = ["上证指数", "深证成指", "创业板指", "科创50",
+                       "沪深300", "中证500", "中证1000", "中证2000"]
+            result = df[df["名称"].isin(targets)].copy()
+            if len(result) >= 4:
+                records = []
+                for _, row in result.iterrows():
+                    records.append({
+                        "指数名称": row["名称"],
+                        "当前点位": round(float(row["最新价"]), 2),
+                        "涨跌幅(%)": round(float(row["涨跌幅"]), 2),
+                        "涨跌额": round(float(row["涨跌额"]), 2),
+                        "成交额(亿)": round(float(row["成交额"]) / 1e8, 2) if row.get("成交额") else 0,
+                    })
+                # 排序
+                order = {v: i for i, v in enumerate(targets)}
+                records.sort(key=lambda x: order.get(x["指数名称"], 99))
+                print(f"  ✅ 大盘指数(东财): {len(records)} 个")
+                return records
+    except Exception as e:
+        print(f"  ⚠️ 东方财富指数失败: {e}")
+
+    # 备用：新浪财经
+    result = sina_index_spot()
     if result:
-        print(f"  ✅ 获取到 {len(result)} 个指数")
-    return result or []
+        print(f"  ✅ 大盘指数(新浪): {len(result)} 个")
+        return result
+
+    print("  ❌ 大盘指数获取失败")
+    return []
 
 
 # ============================================================
@@ -79,7 +138,7 @@ def get_market_index():
 # ============================================================
 
 def get_historical_amount():
-    """获取成交额环比和5日均值对比"""
+    """成交额环比和5日均值"""
     print("📅 获取历史成交额对比...")
     amounts = em_index_daily("1.000001", days=6)
     if not amounts or len(amounts) < 2:
@@ -105,31 +164,30 @@ def get_historical_amount():
 
 
 # ============================================================
-# 行业板块（增强版：成交额 + 领涨股TOP3）
+# 行业板块
 # ============================================================
 
 def get_industry_sectors():
-    """获取行业板块行情 + 领涨股TOP3"""
+    """行业板块 + 领涨股TOP3"""
     print("🏭 获取行业板块...")
-    industries = _get_industry_cache()
+    industries = _get_industry_from_em()
+
     if not industries:
+        print("  ⚠️ 行业板块数据为空")
         return {"all": [], "top10": [], "bottom5": []}
 
-    all_sectors = industries.copy()
-
-    # top10 + 获取领涨股TOP3
-    top10 = all_sectors[:10]
+    # top10 + 领涨股TOP3
+    top10 = industries[:10]
     print(f"  获取领涨股TOP3（{len(top10)}个板块）...")
     for sector in top10:
         code = sector.get("板块代码", "")
         if code:
             stocks = em_board_stocks(code, "industry")
             if stocks:
-                sorted_stocks = sorted(stocks, key=lambda x: x["涨跌幅(%)"], reverse=True)
-                top3 = sorted_stocks[:3]
+                sorted_s = sorted(stocks, key=lambda x: x["涨跌幅(%)"], reverse=True)
                 sector["领涨股TOP3"] = [
                     {"名称": s["名称"], "代码": s["代码"], "涨跌幅(%)": round(s["涨跌幅(%)"], 2)}
-                    for s in top3
+                    for s in sorted_s[:3]
                 ]
             else:
                 sector["领涨股TOP3"] = []
@@ -137,29 +195,29 @@ def get_industry_sectors():
             sector["领涨股TOP3"] = []
         sector["强势天数"] = "N/A"
 
-    bottom5 = all_sectors[-5:] if len(all_sectors) >= 5 else []
+    bottom5 = industries[-5:] if len(industries) >= 5 else []
     bottom5.reverse()
 
-    return {"all": all_sectors, "top10": top10, "bottom5": bottom5}
+    return {"all": industries, "top10": top10, "bottom5": bottom5}
 
 
 # ============================================================
-# 概念板块（增强版：涨停个数 + 涨超5%个数）
+# 概念板块
 # ============================================================
 
 def get_concept_sectors():
-    """获取概念板块 + 涨停/涨超5%统计"""
+    """概念板块 + 涨停/涨超5%统计"""
     print("💡 获取概念板块...")
-    concepts = _get_concept_cache()
+    concepts = _get_concept_from_em()
+
     if not concepts:
+        print("  ⚠️ 概念板块数据为空")
         return {"top10": [], "bottom5": []}
 
-    all_concepts = concepts.copy()
-    top10_raw = all_concepts[:10]
-    bottom5 = all_concepts[-5:] if len(all_concepts) >= 5 else []
+    top10_raw = concepts[:10]
+    bottom5 = concepts[-5:] if len(concepts) >= 5 else []
     bottom5.reverse()
 
-    # 对 top10 统计成分股
     print(f"  统计概念板块成分股（{len(top10_raw)}个）...")
     top10 = []
     for concept in top10_raw:
@@ -184,20 +242,17 @@ def get_concept_sectors():
 # ============================================================
 
 def get_limit_up_down():
-    """获取全量涨停数据 + 智能归因分析"""
+    """涨停板全量 + 智能归因"""
     print("📈 获取涨停板数据...")
     today_str = datetime.now().strftime("%Y%m%d")
 
-    # 1. 获取涨停池数据
+    # 获取涨停池
     df_up = em_limit_up_detail(today_str)
     limit_up_count = len(df_up) if df_up is not None and not (hasattr(df_up, 'empty') and df_up.empty) else 0
 
-    # 2. 获取强势股池（辅助归因）
-    df_strong = em_limit_up_detail_strong(today_str)
-
-    # 3. 获取行业和概念排名（用于归因）
-    industries = _get_industry_cache()
-    concepts = _get_concept_cache()
+    # 获取行业和概念排名
+    industries = _get_industry_from_em()
+    concepts = _get_concept_from_em()
 
     industry_ranking = {}
     for i, ind in enumerate(industries):
@@ -207,17 +262,15 @@ def get_limit_up_down():
     for i, con in enumerate(concepts):
         concept_ranking[con["概念名称"]] = {"rank": i + 1, "pct": con["涨跌幅(%)"]}
 
-    # 4. 构建股票-板块映射表
-    board_stock_map = _build_board_stock_map()
+    board_stock_map = {}
 
-    # 5. 处理涨停明细
+    # 处理涨停明细
     limit_up_details = []
     if df_up is not None and not (hasattr(df_up, 'empty') and df_up.empty):
         for _, row in df_up.iterrows():
             stock_code = str(row.get("代码", ""))
             stock_name = str(row.get("名称", ""))
 
-            # 涨停原因智能归因
             stock_info = {
                 "代码": stock_code,
                 "名称": stock_name,
@@ -242,12 +295,12 @@ def get_limit_up_down():
                 "归因详情": reason["details"]
             })
 
-    # 6. 归因汇总
+    # 归因汇总
     reason_summary = _summarize_reasons(limit_up_details)
 
-    # 7. 跌停数量（从全市场数据中统计）
+    # 跌停数量
     limit_down_count = 0
-    spot = _get_spot_cache()
+    spot = _get_spot_sina()
     if spot:
         limit_down_count = sum(1 for s in spot if s["涨跌幅"] <= -9.9)
 
@@ -259,19 +312,12 @@ def get_limit_up_down():
     }
 
 
-def _build_board_stock_map():
-    """构建股票→行业+概念映射表（用于涨停归因）"""
-    # 只对涨停股做映射，减少API调用。这里预构建常用映射。
-    # 实际运行时从涨停池数据中提取
-    return {}  # 占位，归因引擎的行业/概念部分已通过板块排名实现
-
-
 def _summarize_reasons(details):
     """涨停归因汇总"""
     lb_count = {"首板": 0, "2连板": 0, "3-4连板": 0, "5连板及以上": 0}
     time_count = {"早盘秒板": 0, "早盘封板": 0, "其他": 0}
-    board_count = {}  # 行业板块涨停数
-    concept_count = {}  # 概念板块涨停数
+    board_count = {}
+    concept_count = {}
 
     for stock in details:
         reason = stock.get("涨停原因", "")
@@ -298,19 +344,16 @@ def _summarize_reasons(details):
         else:
             time_count["其他"] += 1
 
-        # 行业归因统计
         ind_attr = detail.get("行业归因", "")
         if ind_attr:
             ind_name = ind_attr.split("(")[0] if "(" in ind_attr else ind_attr
             board_count[ind_name] = board_count.get(ind_name, 0) + 1
 
-        # 概念归因统计
         con_attr = detail.get("概念归因", "")
         if con_attr:
             con_name = con_attr.split("(")[0] if "(" in con_attr else con_attr
             concept_count[con_name] = concept_count.get(con_name, 0) + 1
 
-    # 取前10行业和概念
     top_boards = sorted(board_count.items(), key=lambda x: x[1], reverse=True)[:10]
     top_concepts = sorted(concept_count.items(), key=lambda x: x[1], reverse=True)[:10]
 
@@ -323,13 +366,13 @@ def _summarize_reasons(details):
 
 
 # ============================================================
-# 市场宽度 + 成交额对比
+# 市场宽度
 # ============================================================
 
 def get_market_breadth():
-    """市场宽度：涨跌家数、成交额、成交额对比"""
+    """市场宽度"""
     print("📉 获取市场宽度...")
-    spot = _get_spot_cache()
+    spot = _get_spot_sina()
 
     if not spot:
         return {
@@ -344,30 +387,27 @@ def get_market_breadth():
     down = sum(1 for s in spot if s["涨跌幅"] < 0)
     flat = len(spot) - up - down
 
-    # 涨幅分布
-    surge_9_plus = sum(1 for s in spot if s["涨跌幅"] >= 9)
+    surge_9 = sum(1 for s in spot if s["涨跌幅"] >= 9)
     surge_5_9 = sum(1 for s in spot if 5 <= s["涨跌幅"] < 9)
     surge_3_5 = sum(1 for s in spot if 3 <= s["涨跌幅"] < 5)
     up_0_3 = sum(1 for s in spot if 0 < s["涨跌幅"] < 3)
     down_0_3 = sum(1 for s in spot if -3 < s["涨跌幅"] <= 0)
     down_3_5 = sum(1 for s in spot if -5 < s["涨跌幅"] <= -3)
     down_5_9 = sum(1 for s in spot if -9 < s["涨跌幅"] <= -5)
-    plunge_9_plus = sum(1 for s in spot if s["涨跌幅"] <= -9)
+    plunge_9 = sum(1 for s in spot if s["涨跌幅"] <= -9)
 
-    total_amount = sum(s["成交额"] for s in spot) / 1e8
+    total_amount = sum(s["成交额"] for s in spot)
     amount_compare = get_historical_amount()
 
     return {
-        "上涨家数": up,
-        "下跌家数": down,
-        "平盘家数": flat,
+        "上涨家数": up, "下跌家数": down, "平盘家数": flat,
         "总成交额(亿)": round(total_amount, 2),
         "成交额对比": amount_compare,
         "涨幅分布": {
-            "涨停(≥9%)": surge_9_plus, "大涨(5%-9%)": surge_5_9,
+            "涨停(≥9%)": surge_9, "大涨(5%-9%)": surge_5_9,
             "中涨(3%-5%)": surge_3_5, "小涨(0-3%)": up_0_3,
             "小跌(0-3%)": down_0_3, "中跌(3%-5%)": down_3_5,
-            "大跌(5%-9%)": down_5_9, "跌停(≤-9%)": plunge_9_plus
+            "大跌(5%-9%)": down_5_9, "跌停(≤-9%)": plunge_9
         }
     }
 
@@ -377,7 +417,7 @@ def get_market_breadth():
 # ============================================================
 
 def get_north_flow():
-    """北向资金（东方财富 push2 接口）"""
+    """北向资金"""
     print("💰 获取北向资金...")
     try:
         import akshare as ak
@@ -389,19 +429,19 @@ def get_north_flow():
                 "当日净流入(亿)": round(float(latest.get("value", 0)), 2)
             }
     except Exception as e:
-        print(f"  ⚠️ 北向资金获取失败: {e}")
+        print(f"  ⚠️ 北向资金失败: {e}")
 
     return {"日期": "", "当日净流入(亿)": "N/A"}
 
 
 # ============================================================
-# 成交额 TOP20 + 占比
+# 成交额 TOP20
 # ============================================================
 
 def get_leading_stocks():
-    """成交额前20热门个股 + 占比"""
+    """成交额 TOP20"""
     print("🔥 获取热门个股 TOP20...")
-    spot = _get_spot_cache()
+    spot = _get_spot_sina()
 
     if not spot:
         return {"top20": [], "top20成交额合计(亿)": 0, "top20占比(%)": 0}
@@ -414,17 +454,17 @@ def get_leading_stocks():
     result = []
     for s in top20:
         result.append({
-            "股票代码": str(s["代码"]),
-            "股票名称": str(s["名称"]),
-            "最新价": round(float(s["最新价"]), 2),
-            "涨跌幅(%)": round(float(s["涨跌幅"]), 2),
-            "成交额(亿)": round(float(s["成交额"]) / 1e8, 2),
-            "换手率(%)": round(float(s.get("换手率", 0)), 2) if s.get("换手率") else "N/A",
+            "股票代码": s["代码"],
+            "股票名称": s["名称"],
+            "最新价": round(s["最新价"], 2),
+            "涨跌幅(%)": round(s["涨跌幅"], 2),
+            "成交额(亿)": round(s["成交额"], 2),
+            "换手率(%)": round(s.get("换手率", 0), 2) if s.get("换手率") else "N/A",
         })
 
     return {
         "top20": result,
-        "top20成交额合计(亿)": round(top20_amount / 1e8, 2),
+        "top20成交额合计(亿)": round(top20_amount, 2),
         "top20占比(%)": round(top20_amount / total_amount * 100, 2) if total_amount > 0 else 0
     }
 
@@ -439,10 +479,11 @@ def collect_all_data():
     start_time = time.time()
 
     print(f"\n{'='*60}")
-    print(f"  📊 A股每日复盘数据采集 v3.0 - {today}")
-    print(f"  数据源: 东方财富 push2（主） + 新浪财经（备）")
+    print(f"  📊 A股每日复盘数据采集 v3.1 - {today}")
+    print(f"  主力: 新浪数据源 + 东方财富涨停板")
     print(f"{'='*60}\n")
 
+    # 并行预热缓存
     data = {
         "日期": today,
         "采集时间": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -455,7 +496,6 @@ def collect_all_data():
         "热门个股": get_leading_stocks()
     }
 
-    # 保存 JSON
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     json_path = os.path.join(OUTPUT_DIR, f"data_{today}.json")
     with open(json_path, "w", encoding="utf-8") as f:
@@ -466,30 +506,20 @@ def collect_all_data():
         json.dump(data, f, ensure_ascii=False, indent=2, default=str)
 
     elapsed = time.time() - start_time
-    print(f"\n✅ 数据采集完成，耗时 {elapsed:.1f}s，已保存至: {json_path}")
+    print(f"\n✅ 数据采集完成，耗时 {elapsed:.1f}s")
     return data
 
 
 if __name__ == "__main__":
     data = collect_all_data()
-
-    # 简要输出
     if data["大盘指数"]:
         print("\n📊 大盘指数:")
-        for idx in data["大盘指数"]:
-            direction = "📈" if idx["涨跌幅(%)"] >= 0 else "📉"
-            print(f"  {direction} {idx['指数名称']}: {idx['当前点位']} ({idx['涨跌幅(%)']:+.2f}%)")
-
+        for idx in data["大盘指数"][:4]:
+            d = "📈" if idx["涨跌幅(%)"] >= 0 else "📉"
+            print(f"  {d} {idx['指数名称']}: {idx['当前点位']} ({idx['涨跌幅(%)']:+.2f}%)")
     bw = data["市场宽度"]
-    print(f"\n📉 涨跌: 上涨{bw['上涨家数']} / 下跌{bw['下跌家数']} / 平盘{bw['平盘家数']}")
-    print(f"💰 总成交额: {bw['总成交额(亿)']}亿")
-
-    ac = bw.get("成交额对比", {})
-    if ac.get("环比变化(%)") != "N/A":
-        print(f"📊 环比: {ac['环比变化(%)']:+.2f}% | 5日均: {ac['5日均成交额(亿)']}亿")
-
+    print(f"\n📉 涨: {bw['上涨家数']} / 跌: {bw['下跌家数']} | 成交额: {bw['总成交额(亿)']}亿")
     zt = data["涨跌停统计"]
     print(f"🚀 涨停: {zt['涨停数量']} | 跌停: {zt['跌停数量']}")
-
     hs = data["热门个股"]
-    print(f"🔥 成交额TOP20占比: {hs.get('top20占比(%)', 0)}%")
+    print(f"🔥 TOP20占比: {hs.get('top20占比(%)', 0)}%")
