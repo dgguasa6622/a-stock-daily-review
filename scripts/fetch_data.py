@@ -53,7 +53,7 @@ def _get_spot_sina():
                     "涨跌幅": float(row.get("涨跌幅", 0) or 0),
                     "昨收": float(row.get("昨收", 0) or 0),
                     "成交量": float(row.get("成交量", 0) or 0),
-                    "成交额": float(row.get("成交额", 0) or 0),
+                    "成交额": float(row.get("成交额", 0) or 0) / 1e8,  # 新浪数据源单位是「元」，转为「亿元」
                     "换手率": float(row.get("换手率", 0) or 0),
                     "流通市值": float(row.get("流通市值", 0) or 0),
                 })
@@ -138,10 +138,11 @@ def get_market_index():
 # ============================================================
 
 def get_historical_amount():
-    """成交额环比和5日均值"""
+    """成交额环比和5日均值（东方财富K线优先，失败则用N/A标记）"""
     print("📅 获取历史成交额对比...")
     amounts = em_index_daily("1.000001", days=6)
     if not amounts or len(amounts) < 2:
+        print("  ⚠️ 历史成交额获取失败（东方财富K线不可用）")
         return {
             "前一交易日成交额(亿)": "N/A", "环比变化(%)": "N/A",
             "5日均成交额(亿)": "N/A", "与5日均值比(%)": "N/A"
@@ -396,7 +397,7 @@ def get_market_breadth():
     down_5_9 = sum(1 for s in spot if -9 < s["涨跌幅"] <= -5)
     plunge_9 = sum(1 for s in spot if s["涨跌幅"] <= -9)
 
-    total_amount = sum(s["成交额"] for s in spot)
+    total_amount = sum(s["成交额"] for s in spot)  # 已在缓存层转为亿元
     amount_compare = get_historical_amount()
 
     return {
