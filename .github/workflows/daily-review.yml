@@ -1,16 +1,7 @@
 name: A股每日复盘
 
 on:
-  schedule:
-    # 北京时间 17:30 = UTC 09:30
-    - cron: '30 9 * * 1-5'   # 周一到周五
-  workflow_dispatch:          # 支持手动触发
-  push:
-    branches:
-      - main
-    paths:
-      - 'scripts/**'
-      - '.github/workflows/**'
+  workflow_dispatch:          # 仅支持手动触发（已停用自动推送）
 
 jobs:
   review:
@@ -32,7 +23,7 @@ jobs:
       
       - name: 安装依赖
         run: |
-          pip install akshare pandas
+          pip install akshare pandas pytdx requests
       
       - name: 获取数据 & 生成报告
         run: |
