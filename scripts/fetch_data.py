@@ -21,7 +21,8 @@ sys.path.insert(0, os.path.dirname(__file__))
 from data_sources import (
     sina_index_spot, em_index_daily, em_limit_up_detail,
     em_limit_up_detail_strong, analyze_limit_up_reason,
-    em_industry_boards, em_concept_boards, em_board_stocks
+    em_industry_boards, em_concept_boards, em_board_stocks,
+    tdx_get_recent_amounts, tdx_is_available
 )
 
 OUTPUT_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "docs")
@@ -138,10 +139,28 @@ def get_market_index():
 # ============================================================
 
 def get_historical_amount():
-    """成交额环比和5日均值"""
+    """成交额环比和5日均值（本地通达信 > 网络数据源）"""
     print("📅 获取历史成交额对比...")
-    
-    # 方案1: 东方财富 push2his K线接口（和 push2 不同域名，Actions 中可能可用）
+
+    # 方案0: 通达信本地数据（最快、最可靠，GitHub Actions 中自动跳过）
+    if tdx_is_available():
+        amounts = tdx_get_recent_amounts("000001", "sh", days=6)
+        if amounts and len(amounts) >= 2:
+            today_amt = amounts[-1]
+            prev_amt = amounts[-2]
+            prev_5 = amounts[-6:-1] if len(amounts) >= 6 else amounts[:-1]
+            avg_5d = sum(prev_5) / len(prev_5) if prev_5 else today_amt
+            prev_change = ((today_amt - prev_amt) / prev_amt * 100) if prev_amt > 0 else 0
+            vs_5d = ((today_amt - avg_5d) / avg_5d * 100) if avg_5d > 0 else 0
+            print(f"  ✅ [通达信] 环比: {prev_change:+.2f}%, 5日均: {avg_5d:.1f}亿")
+            return {
+                "前一交易日成交额(亿)": round(prev_amt, 2),
+                "环比变化(%)": round(prev_change, 2),
+                "5日均成交额(亿)": round(avg_5d, 2),
+                "与5日均值比(%)": round(vs_5d, 2)
+            }
+
+    # 方案1: 东方财富 push2his K线接口
     amounts = em_index_daily("1.000001", days=6)
     if amounts and len(amounts) >= 2:
         today_amt = amounts[-1]

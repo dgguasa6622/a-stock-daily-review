@@ -563,3 +563,121 @@ if __name__ == "__main__":
     if sx:
         for i in sx:
             print(f"   {i['指数名称']}: {i['当前点位']} ({i['涨跌幅(%)']:+.2f}%)")
+
+
+# ============================================================
+# 数据源 5：通达信本地数据（pytdx）
+# 仅在本地有通达信数据时可用，GitHub Actions 中自动跳过
+# ============================================================
+
+# 常见的通达信 vipdoc 目录
+_TDX_COMMON_PATHS = [
+    r"C:\new_tdx\vipdoc",
+    r"C:\通达信\vipdoc",
+    r"D:\new_tdx\vipdoc",
+    r"C:\zd_tdx\vipdoc",
+    r"D:\通达信\vipdoc",
+    r"C:\Program Files\通达信\vipdoc",
+]
+
+
+def _detect_tdx_path():
+    """自动检测通达信数据目录"""
+    import os
+    # 1. 环境变量优先
+    env_path = os.environ.get("TDX_VIPDOC_PATH", "")
+    if env_path and os.path.isdir(env_path):
+        return env_path
+
+    # 2. 常见路径检测
+    for path in _TDX_COMMON_PATHS:
+        if os.path.isdir(path):
+            # 检查是否有标准子目录
+            if os.path.isdir(os.path.join(path, "sh", "lday")):
+                return path
+
+    return None
+
+
+def tdx_is_available():
+    """检查通达信本地数据是否可用"""
+    return _detect_tdx_path() is not None
+
+
+def tdx_index_daily(code="000001", market="sh", days=6):
+    """
+    从通达信本地数据读取指数日K线
+
+    参数:
+        code: 指数代码（如 000001=上证指数, 399001=深证成指）
+        market: sh(沪市) 或 sz(深市)
+        days: 取最近N天
+
+    返回: [成交额(亿), ...] 列表，按日期升序
+    """
+    vipdoc = _detect_tdx_path()
+    if not vipdoc:
+        return None
+
+    try:
+        from pytdx.reader import TdxDailyBarReader
+        reader = TdxDailyBarReader(vipdoc_path=vipdoc)
+
+        # 通达信代码格式：market + code，如 sh000001
+        tdx_code = f"{market}{code}"
+
+        df = reader.get_df_by_code(tdx_code, market)
+        if df is None or df.empty:
+            return None
+
+        # 取最近 N 天
+        df = df.tail(days)
+        # pytdx 返回的 amount 字段单位是「元」
+        amounts = (df["amount"] / 1e8).tolist()
+        return amounts
+    except ImportError:
+        # pytdx 未安装
+        return None
+    except Exception as e:
+        print(f"  ⚠️ 通达信数据读取失败({tdx_code}): {e}")
+        return None
+
+
+def tdx_stock_daily(code, market="sh"):
+    """
+    从通达信本地数据读取个股日K线
+
+    参数:
+        code: 股票代码（6位）
+        market: sh 或 sz
+
+    返回: DataFrame（pytdx 格式：date, open, high, low, close, amount, volume）
+    """
+    vipdoc = _detect_tdx_path()
+    if not vipdoc:
+        return None
+
+    try:
+        from pytdx.reader import TdxDailyBarReader
+        reader = TdxDailyBarReader(vipdoc_path=vipdoc)
+        tdx_code = f"{market}{code}"
+        return reader.get_df_by_code(tdx_code, market)
+    except Exception as e:
+        print(f"  ⚠️ 通达信个股数据读取失败({market}{code}): {e}")
+        return None
+
+
+def tdx_get_recent_amounts(code="000001", market="sh", days=6):
+    """
+    便捷函数：获取最近N日成交额列表（亿）
+    用于历史成交额对比
+    """
+    return tdx_index_daily(code, market, days)
+
+
+# 在模块加载时打印检测结果
+_tdx_path = _detect_tdx_path()
+if _tdx_path:
+    print(f"📂 检测到通达信本地数据: {_tdx_path}")
+else:
+    print("📂 未检测到通达信本地数据（将使用网络数据源）")
