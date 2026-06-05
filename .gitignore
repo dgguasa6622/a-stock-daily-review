@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.env
+output/*.json
+!output/index.html
+!output/report.md

@@ -1,0 +1,67 @@
+name: A股每日复盘
+
+on:
+  schedule:
+    # 北京时间 17:30 = UTC 09:30
+    - cron: '30 9 * * 1-5'   # 周一到周五
+  workflow_dispatch:          # 支持手动触发
+  push:
+    branches:
+      - main
+    paths:
+      - 'scripts/**'
+      - '.github/workflows/**'
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: 安装依赖
+        run: |
+          pip install akshare pandas
+      
+      - name: 获取数据 & 生成报告
+        run: |
+          python scripts/main.py
+      
+      - name: 发送邮件
+        if: env.SMTP_USER != ''
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          TO_EMAILS: ${{ secrets.TO_EMAILS }}
+        run: |
+          python scripts/send_email.py
+      
+      - name: 提交报告到仓库
+        run: |
+          git config user.name "A-Stock Review Bot"
+          git config user.email "bot@a-stock-review.local"
+          git add output/
+          git diff --staged --quiet || git commit -m "📊 每日复盘报告 $(date +%Y-%m-%d)"
+          git push
+      
+      - name: 部署到 GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./output
+          destination_dir: ./
+          commit_message: 'Deploy: 每日复盘报告'
+          keep_files: true
